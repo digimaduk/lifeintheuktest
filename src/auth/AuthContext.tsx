@@ -9,16 +9,19 @@ import {
 
 type AuthUser = {
   username: string
+  email: string
 }
 
 type AuthContextValue = {
   user: AuthUser | null
   isAuthenticated: boolean
-  login: (username: string, password: string) => Promise<boolean>
+  login: (identifier: string, password: string) => Promise<boolean>
+  register: (payload: { email: string; username: string; password: string }) => Promise<boolean>
   logout: () => void
 }
 
 const STORAGE_KEY = 'lifeintheuktest.auth.user'
+const API_BASE_URL = 'https://mongodb-nodejs-service.onrender.com'
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined)
 
@@ -47,16 +50,59 @@ function saveUserToStorage(user: AuthUser | null) {
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(() => loadUserFromStorage())
 
-  const login = useCallback(async (username: string, password: string) => {
-    const valid = username === 'admin' && password === 'password'
+  const login = useCallback(async (identifier: string, password: string) => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/users`, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+      })
+      if (!res.ok) return false
 
-    if (!valid) return false
+      const users = (await res.json()) as Array<{
+        email?: string
+        username?: string
+        password?: string
+        name?: string
+      }>
 
-    const nextUser: AuthUser = { username }
-    setUser(nextUser)
-    saveUserToStorage(nextUser)
-    return true
+      const normalizedIdentifier = identifier.trim().toLowerCase()
+      const match = users.find((u) => {
+        const email = (u.email ?? '').trim().toLowerCase()
+        const username = (u.username ?? u.name ?? '').trim().toLowerCase()
+        const okId = normalizedIdentifier === email || normalizedIdentifier === username
+        const okPw = (u.password ?? '') === password
+        return okId && okPw
+      })
+
+      if (!match) return false
+
+      const nextUser: AuthUser = {
+        username: match.username ?? match.name ?? identifier,
+        email: match.email ?? '',
+      }
+      setUser(nextUser)
+      saveUserToStorage(nextUser)
+      return true
+    } catch {
+      return false
+    }
   }, [])
+
+  const register = useCallback(
+    async (payload: { email: string; username: string; password: string }) => {
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/users`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        })
+        return res.ok
+      } catch {
+        return false
+      }
+    },
+    [],
+  )
 
   const logout = useCallback(() => {
     setUser(null)
@@ -68,9 +114,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       user,
       isAuthenticated: Boolean(user),
       login,
+      register,
       logout,
     }),
-    [user, login, logout],
+    [user, login, register, logout],
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

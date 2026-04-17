@@ -1,5 +1,6 @@
 import { NavLink } from 'react-router-dom'
 import { useAuth } from '../auth/AuthContext'
+import ukFlag from '../assets/uk_flag.png'
 
 function NavItem({ to, label }: { to: string; label: string }) {
   return (
@@ -21,7 +22,7 @@ function NavItem({ to, label }: { to: string; label: string }) {
 }
 
 export default function TopNav() {
-  const { isAuthenticated, logout } = useAuth()
+  const { isAuthenticated, logout, user } = useAuth()
 
   return (
     <header
@@ -72,7 +73,25 @@ export default function TopNav() {
             </>
           ) : (
             <>
-              <NavItem to="/" label="Account" />
+              <span
+                aria-hidden="true"
+                title={user?.username ?? ''}
+                style={{
+                  alignSelf: 'center',
+                  width: 28,
+                  height: 28,
+                  borderRadius: 999,
+                  overflow: 'hidden',
+                  border: '1px solid rgba(255,255,255,0.25)',
+                  display: 'inline-flex',
+                }}
+              >
+                <img
+                  src={ukFlag}
+                  alt=""
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                />
+              </span>
               <button
                 onClick={() => logout()}
                 style={{

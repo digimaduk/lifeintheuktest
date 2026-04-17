@@ -24,9 +24,7 @@ export default function LoginPage() {
   return (
     <div style={{ maxWidth: 420, margin: '72px auto', padding: 16 }}>
       <h1 style={{ marginBottom: 8 }}>Login</h1>
-      <p style={{ marginTop: 0, opacity: 0.8 }}>
-        Use <code>admin</code> / <code>password</code>
-      </p>
+      <p style={{ marginTop: 0, opacity: 0.8 }}>Use your email or username</p>
 
       <form
         onSubmit={async (e) => {

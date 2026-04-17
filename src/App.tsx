@@ -56,6 +56,14 @@ function App() {
           }
         />
         <Route
+          path="/important-facts/:category"
+          element={
+            <RequireAuth>
+              <ImportantFactsPage />
+            </RequireAuth>
+          }
+        />
+        <Route
           path="/topics/:topicId"
           element={
             <RequireAuth>
