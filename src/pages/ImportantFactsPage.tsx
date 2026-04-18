@@ -13,6 +13,7 @@ type ApiFact = {
   facts: string[]
   year?: number | string
   century?: number | string
+  imgPath?: string
   type: string
 }
 
@@ -389,6 +390,26 @@ export default function ImportantFactsPage() {
                         <div style={{ opacity: 0.7 }}>({String(f.century)})</div>
                       ) : null}
                     </div>
+
+                    {activeCategory.slug === 'flag' &&
+                    f.imgPath &&
+                    String(f.imgPath).trim() !== '' ? (
+                      <div style={{ marginTop: 10 }}>
+                        <img
+                          src={String(f.imgPath)}
+                          alt={f.title}
+                          loading="lazy"
+                          style={{
+                            width: '100%',
+                            maxWidth: 520,
+                            height: 'auto',
+                            borderRadius: 12,
+                            border: '1px solid rgba(0,0,0,0.12)',
+                            display: 'block',
+                          }}
+                        />
+                      </div>
+                    ) : null}
 
                     {normalizeFactsList(f.facts).length > 0 ? (
                       <div style={{ marginTop: 8, lineHeight: 1.6 }}>
