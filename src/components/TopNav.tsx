@@ -61,6 +61,7 @@ export default function TopNav() {
         >
           <NavItem to="/" label="Home" />
           <NavItem to="/about" label="About" />
+          <NavItem to="/contact" label="Contact" />
           <NavItem to="/practice-tests" label="Practice Tests" />
           <NavItem to="/study-guide" label="Study Guide" />
         </nav>

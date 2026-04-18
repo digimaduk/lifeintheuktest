@@ -1,8 +1,10 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
 import { RequireAuth } from './auth/RequireAuth'
 import TopNav from './components/TopNav'
+import WithSupportSidebar from './components/WithSupportSidebar'
 import AboutPage from './pages/AboutPage'
 import ChapterWiseQuestionsPage from './pages/ChapterWiseQuestionsPage'
+import ContactPage from './pages/ContactPage'
 import HomePage from './pages/HomePage'
 import ImportantFactsPage from './pages/ImportantFactsPage'
 import LoginPage from './pages/LoginPage'
@@ -18,16 +20,50 @@ function App() {
     <>
       <TopNav />
       <Routes>
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/signup" element={<SignupPage />} />
-        <Route path="/about" element={<AboutPage />} />
+        <Route
+          path="/login"
+          element={
+            <WithSupportSidebar>
+              <LoginPage />
+            </WithSupportSidebar>
+          }
+        />
+        <Route
+          path="/signup"
+          element={
+            <WithSupportSidebar>
+              <SignupPage />
+            </WithSupportSidebar>
+          }
+        />
+        <Route
+          path="/about"
+          element={
+            <WithSupportSidebar>
+              <AboutPage />
+            </WithSupportSidebar>
+          }
+        />
+        <Route
+          path="/contact"
+          element={
+            <WithSupportSidebar>
+              <ContactPage />
+            </WithSupportSidebar>
+          }
+        />
 
-        <Route path="/" element={<HomePage />} />
+        <Route
+          path="/"
+          element={<HomePage />}
+        />
         <Route
           path="/chapter-wise-questions"
           element={
             <RequireAuth>
-              <ChapterWiseQuestionsPage />
+              <WithSupportSidebar>
+                <ChapterWiseQuestionsPage />
+              </WithSupportSidebar>
             </RequireAuth>
           }
         />
@@ -35,7 +71,9 @@ function App() {
           path="/practice-tests"
           element={
             <RequireAuth>
-              <PracticeTestsPage />
+              <WithSupportSidebar>
+                <PracticeTestsPage />
+              </WithSupportSidebar>
             </RequireAuth>
           }
         />
@@ -43,7 +81,9 @@ function App() {
           path="/progress-tracker"
           element={
             <RequireAuth>
-              <ProgressTrackerPage />
+              <WithSupportSidebar>
+                <ProgressTrackerPage />
+              </WithSupportSidebar>
             </RequireAuth>
           }
         />
@@ -51,7 +91,9 @@ function App() {
           path="/important-facts"
           element={
             <RequireAuth>
-              <ImportantFactsPage />
+              <WithSupportSidebar>
+                <ImportantFactsPage />
+              </WithSupportSidebar>
             </RequireAuth>
           }
         />
@@ -59,7 +101,9 @@ function App() {
           path="/important-facts/:category"
           element={
             <RequireAuth>
-              <ImportantFactsPage />
+              <WithSupportSidebar>
+                <ImportantFactsPage />
+              </WithSupportSidebar>
             </RequireAuth>
           }
         />
@@ -67,7 +111,9 @@ function App() {
           path="/topics/:topicId"
           element={
             <RequireAuth>
-              <TopicPage />
+              <WithSupportSidebar>
+                <TopicPage />
+              </WithSupportSidebar>
             </RequireAuth>
           }
         />
@@ -75,7 +121,9 @@ function App() {
           path="/practice-tests/:testId"
           element={
             <RequireAuth>
-              <PracticeTestDetailPage />
+              <WithSupportSidebar>
+                <PracticeTestDetailPage />
+              </WithSupportSidebar>
             </RequireAuth>
           }
         />
@@ -83,7 +131,9 @@ function App() {
           path="/study-guide"
           element={
             <RequireAuth>
-              <StudyGuidePage />
+              <WithSupportSidebar>
+                <StudyGuidePage />
+              </WithSupportSidebar>
             </RequireAuth>
           }
         />

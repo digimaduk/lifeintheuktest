@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import type { ReactNode } from 'react'
 import { Link, useParams } from 'react-router-dom'
 
 type FactsCategory = {
@@ -11,6 +12,7 @@ type ApiFact = {
   title: string
   facts: string[]
   year?: number | string
+  century?: number | string
   type: string
 }
 
@@ -58,6 +60,57 @@ function normalizeFactsList(value: unknown): string[] {
   return []
 }
 
+function escapeHtml(value: string): string {
+  return value
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#039;')
+}
+
+function sanitizeFactHtml(value: string): string {
+  if (typeof window === 'undefined' || !('DOMParser' in window)) {
+    return escapeHtml(value)
+  }
+
+  const doc = new window.DOMParser().parseFromString(value, 'text/html')
+
+  function serialize(node: Node): string {
+    if (node.nodeType === Node.TEXT_NODE) {
+      return escapeHtml(node.textContent ?? '')
+    }
+
+    if (node.nodeType !== Node.ELEMENT_NODE) return ''
+
+    const el = node as HTMLElement
+    const tag = el.tagName.toLowerCase()
+
+    if (tag === 'br') return '<br />'
+
+    const children = Array.from(el.childNodes)
+      .map((c) => serialize(c))
+      .join('')
+
+    if (tag === 'strong' || tag === 'b') {
+      return `<strong>${children}</strong>`
+    }
+
+    return children
+  }
+
+  return Array.from(doc.body.childNodes)
+    .map((n) => serialize(n))
+    .join('')
+}
+
+function renderFactLine(line: string): ReactNode {
+  if (!/[<>]/.test(line)) return line
+  const safeHtml = sanitizeFactHtml(line)
+  if (!safeHtml.includes('<strong>') && !safeHtml.includes('<br')) return line
+  return <span dangerouslySetInnerHTML={{ __html: safeHtml }} />
+}
+
 const CATEGORIES: FactsCategory[] = [
   {
     slug: 'battle',
@@ -65,9 +118,74 @@ const CATEGORIES: FactsCategory[] = [
     subtitle: 'Key battles and conflicts to remember.',
   },
   {
+    slug: 'act',
+    title: 'Act',
+    subtitle: 'Key Acts of Parliament and legal milestones.',
+  },
+  {
+    slug: 'court',
+    title: 'Court',
+    subtitle: 'Courts, justice, and legal system facts.',
+  },
+  {
+    slug: 'castle',
+    title: 'Castle',
+    subtitle: 'Castles, fortifications, and historic sites.',
+  },
+  {
+    slug: 'flag',
+    title: 'Flag',
+    subtitle: 'Flags, symbols, and national identity.',
+  },
+  {
     slug: 'charity',
     title: 'Charity',
     subtitle: 'UK charity and volunteering facts.',
+  },
+  {
+    slug: 'flower',
+    title: 'Flower',
+    subtitle: 'National flowers, symbols, and meanings.',
+  },
+  {
+    slug: 'food',
+    title: 'Food',
+    subtitle: 'Traditional foods and UK food facts.',
+  },
+  {
+    slug: 'festival',
+    title: 'Festival',
+    subtitle: 'Festivals and major cultural events.',
+  },
+  {
+    slug: 'map',
+    title: 'Map',
+    subtitle: 'Geography, regions, and map-related facts.',
+  },
+  {
+    slug: 'movie',
+    title: 'Movie',
+    subtitle: 'Films, cinema, and UK cultural references.',
+  },
+  {
+    slug: 'olympics',
+    title: 'Olympics',
+    subtitle: 'Olympic Games and UK Olympic history.',
+  },
+  {
+    slug: 'people',
+    title: 'People',
+    subtitle: 'Important people and key figures.',
+  },
+  {
+    slug: 'prime minister',
+    title: 'Prime Minister',
+    subtitle: 'Prime Ministers and political leadership facts.',
+  },
+  {
+    slug: 'population',
+    title: 'Population',
+    subtitle: 'Population, demographics, and key numbers.',
   },
   {
     slug: 'place',
@@ -78,6 +196,11 @@ const CATEGORIES: FactsCategory[] = [
     slug: 'sports',
     title: 'Sports',
     subtitle: 'Popular sports and UK sporting history.',
+  },
+  {
+    slug: 'world war',
+    title: 'World War',
+    subtitle: 'World War I and II facts and key events.',
   },
 ]
 
@@ -219,6 +342,12 @@ export default function ImportantFactsPage() {
           <h2 style={{ margin: '0 0 8px' }}>{activeCategory.title}</h2>
           <p style={{ marginTop: 0, opacity: 0.85 }}>{activeCategory.subtitle}</p>
 
+          {activeCategory.slug === 'prime minister' ? (
+            <p style={{ marginTop: 0, marginBottom: 16, opacity: 0.8, fontSize: 14 }}>
+              (C) for Conservative Party, (L) for Labour Party
+            </p>
+          ) : null}
+
           {isLoading ? (
             <p style={{ marginTop: 0, opacity: 0.85 }}>Loading facts...</p>
           ) : error ? (
@@ -250,16 +379,22 @@ export default function ImportantFactsPage() {
                   >
                     <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
                       <div style={{ fontWeight: 800 }}>{f.title}</div>
-                      {f.year !== undefined && f.year !== null && String(f.year).trim() !== '' ? (
-                        <div style={{ opacity: 0.7 }}>(Year: {String(f.year)})</div>
+                      {f.year !== undefined &&
+                      f.year !== null &&
+                      String(f.year).trim() !== '' ? (
+                        <div style={{ opacity: 0.7 }}>({String(f.year)})</div>
+                      ) : f.century !== undefined &&
+                        f.century !== null &&
+                        String(f.century).trim() !== '' ? (
+                        <div style={{ opacity: 0.7 }}>({String(f.century)})</div>
                       ) : null}
                     </div>
 
                     {normalizeFactsList(f.facts).length > 0 ? (
                       <div style={{ marginTop: 8, lineHeight: 1.6 }}>
-                        {normalizeFactsList(f.facts).map((line) => (
-                          <div key={line} style={{ opacity: 0.92 }}>
-                            - {line}
+                        {normalizeFactsList(f.facts).map((line, lineIdx) => (
+                          <div key={`${lineIdx}-${line}`} style={{ opacity: 0.92 }}>
+                            - {renderFactLine(line)}
                           </div>
                         ))}
                       </div>
