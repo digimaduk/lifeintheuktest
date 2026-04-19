@@ -391,9 +391,7 @@ export default function ImportantFactsPage() {
                       ) : null}
                     </div>
 
-                    {activeCategory.slug === 'flag' &&
-                    f.imgPath &&
-                    String(f.imgPath).trim() !== '' ? (
+                    {f.imgPath && String(f.imgPath).trim() !== '' ? (
                       <div style={{ marginTop: 10 }}>
                         <img
                           src={String(f.imgPath)}
