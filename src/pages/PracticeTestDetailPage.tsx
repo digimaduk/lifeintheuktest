@@ -8,6 +8,7 @@ type ApiQuestion = {
   answer?: string
   correctAnswer?: number | string
   explanation?: string
+  test?: number | string
   [key: string]: unknown
 }
 
@@ -52,11 +53,14 @@ function getQuestionText(q: ApiQuestion): string {
 export default function PracticeTestDetailPage() {
   const { testId } = useParams()
 
-  const isTest1 = useMemo(() => {
+  const testNumber = useMemo(() => {
     const raw = String(testId ?? '')
       .trim()
       .toLowerCase()
-    return raw === 'test1'
+    const match = raw.match(/^test(\d+)$/)
+    if (!match) return null
+    const n = Number(match[1])
+    return Number.isFinite(n) ? n : null
   }, [testId])
 
   const [questions, setQuestions] = useState<ApiQuestion[] | null>(null)
@@ -66,7 +70,7 @@ export default function PracticeTestDetailPage() {
   const [selectedOptions, setSelectedOptions] = useState<Record<number, number>>({})
 
   useEffect(() => {
-    if (!isTest1) return
+    if (testNumber === null) return
 
     let cancelled = false
 
@@ -83,7 +87,13 @@ export default function PracticeTestDetailPage() {
         if (!list) throw new Error('Unexpected API response for questions')
 
         if (!cancelled) {
-          setQuestions(list.slice(0, 24))
+          const filtered = list.filter((q) => {
+            const v = (q as ApiQuestion).test
+            const n = Number(v)
+            return Number.isFinite(n) && n === testNumber
+          })
+
+          setQuestions(filtered.slice(0, 24))
           setCurrentIndex(0)
           setSelectedOptions({})
         }
@@ -102,13 +112,15 @@ export default function PracticeTestDetailPage() {
     return () => {
       cancelled = true
     }
-  }, [isTest1])
+  }, [testNumber])
 
   return (
     <div style={{ maxWidth: 900, margin: '32px auto', padding: 16 }}>
-      <h1 style={{ marginBottom: 8 }}>{testId ? testId : 'Practice Test'}</h1>
+      <h1 style={{ marginBottom: 8 }}>
+        {testNumber !== null ? `Test${testNumber}` : testId ? testId : 'Practice Test'}
+      </h1>
 
-      {isTest1 ? (
+      {testNumber !== null ? (
         <>
           {isLoading ? (
             <p style={{ marginTop: 0, opacity: 0.85 }}>Loading questions...</p>
@@ -163,8 +175,13 @@ export default function PracticeTestDetailPage() {
                         const isSelectedIncorrect =
                           checked && correctIndex !== null && optIdx !== correctIndex
 
+                        const isCorrectRevealed =
+                          isIncorrect && correctIndex !== null && optIdx === correctIndex
+
                         const optionBackground = isSelectedCorrect
                           ? '#e6f4ea'
+                          : isCorrectRevealed
+                            ? '#e6f4ea'
                           : isSelectedIncorrect
                             ? '#fce8e6'
                             : checked
@@ -173,6 +190,8 @@ export default function PracticeTestDetailPage() {
 
                         const optionBorder = isSelectedCorrect
                           ? '1px solid rgba(26, 115, 46, 0.45)'
+                          : isCorrectRevealed
+                            ? '1px solid rgba(26, 115, 46, 0.45)'
                           : isSelectedIncorrect
                             ? '1px solid rgba(176, 0, 32, 0.35)'
                           : '1px solid rgba(0,0,0,0.12)'
