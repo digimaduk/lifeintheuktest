@@ -1,4 +1,5 @@
 import { NavLink } from 'react-router-dom'
+import { useMemo, useState } from 'react'
 import { useAuth } from '../auth/AuthContext'
 import ukFlag from '../assets/uk_flag.png'
 
@@ -23,6 +24,23 @@ function NavItem({ to, label }: { to: string; label: string }) {
 
 export default function TopNav() {
   const { isAuthenticated, logout, user } = useAuth()
+  const [isStudyGuideOpen, setIsStudyGuideOpen] = useState(false)
+
+  const studyGuideTopics = useMemo(
+    () => [
+      { label: 'Early Britain', topic: 'early-britain' },
+      { label: 'Roman Britain', topic: 'roman-britain' },
+      { label: 'Early Medieval / Anglo‑Saxon Britain', topic: 'medieval-britain' },
+      { label: 'Viking Age', topic: 'vikings' },
+      { label: 'Norman & Medieval Britain', topic: 'norman-conquest' },
+      { label: 'Tudor Britain', topic: 'tudor-britain' },
+      { label: 'Stuart Britain', topic: 'stuart-britain' },
+      { label: 'Georgian Britain', topic: 'georgian-britain' },
+      { label: 'Victorian Britain', topic: 'victorian-britain' },
+      { label: 'Modern Britain', topic: 'modern-britain' }
+    ],
+    []
+  )
 
   return (
     <header
@@ -63,7 +81,53 @@ export default function TopNav() {
           <NavItem to="/about" label="About" />
           <NavItem to="/contact" label="Contact" />
           <NavItem to="/practice-tests" label="Practice Tests" />
-          <NavItem to="/study-guide" label="Study Guide" />
+          <div
+            style={{
+              position: 'relative',
+              display: 'flex',
+              alignItems: 'center',
+              paddingBottom: 8,
+            }}
+            onMouseEnter={() => setIsStudyGuideOpen(true)}
+            onMouseLeave={() => setIsStudyGuideOpen(false)}
+          >
+            <NavItem to="/study-guide" label="Study Guide" />
+
+            {isStudyGuideOpen ? (
+              <div
+                style={{
+                  position: 'absolute',
+                  top: '100%',
+                  left: 0,
+                  minWidth: 240,
+                  background: '#0b0b0b',
+                  border: '1px solid rgba(255,255,255,0.18)',
+                  borderRadius: 12,
+                  padding: 8,
+                  boxShadow: '0 10px 24px rgba(0,0,0,0.35)',
+                }}
+              >
+                {studyGuideTopics.map((t) => (
+                  <NavLink
+                    key={t.topic}
+                    to={`/study-guide?topic=${encodeURIComponent(t.topic)}`}
+                    style={({ isActive }) => ({
+                      display: 'block',
+                      padding: '10px 10px',
+                      borderRadius: 10,
+                      textDecoration: 'none',
+                      color: '#fff',
+                      opacity: isActive ? 1 : 0.9,
+                      background: isActive ? 'rgba(255,255,255,0.14)' : 'transparent',
+                      fontWeight: 600,
+                    })}
+                  >
+                    {t.label}
+                  </NavLink>
+                ))}
+              </div>
+            ) : null}
+          </div>
         </nav>
 
         <div style={{ justifySelf: 'end', display: 'flex', gap: 6 }}>
