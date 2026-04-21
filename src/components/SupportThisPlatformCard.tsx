@@ -37,20 +37,24 @@ export default function SupportThisPlatformCard() {
         </div>
 
         <div style={{ marginTop: 14 }}>
-          <button
-            type="button"
+          <a
+            href="https://www.paypal.com/donate/?hosted_button_id=ZWHNDRY7JB77G"
+            target="_blank"
+            rel="noreferrer"
             style={{
+              display: 'inline-block',
               padding: '10px 14px',
               borderRadius: 10,
               border: '1px solid rgba(0,0,0,0.18)',
-              background: '#000',
-              color: '#fff',
+              background: '#ffd54a',
+              color: '#111',
               fontWeight: 700,
+              textDecoration: 'none',
               cursor: 'pointer',
             }}
           >
             Donate
-          </button>
+          </a>
         </div>
       </div>
     </aside>
