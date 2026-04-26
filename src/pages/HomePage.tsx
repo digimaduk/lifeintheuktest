@@ -127,7 +127,16 @@ export default function HomePage() {
           >
             <h3 style={{ margin: '0 0 10px' }}>💻 Booking Details</h3>
             <ul style={{ margin: 0, paddingLeft: 18 }}>
-              <li>Book online through the official GOV.UK website</li>
+              <li>
+                <a
+                  href="https://www.lituktestbooking.co.uk/lituk-web/login"
+                  target="_blank"
+                  rel="noreferrer"
+                  style={{ color: '#0b57d0', textDecoration: 'none', fontWeight: 600 }}
+                >
+                  Book online through the official GOV.UK website
+                </a>
+              </li>
               <li>
                 <strong>Fee:</strong> £50
               </li>
@@ -157,7 +166,7 @@ export default function HomePage() {
         >
           <h3 style={{ margin: '0 0 10px' }}>🏁 After the Test</h3>
           <p style={{ marginTop: 0, marginBottom: 10, opacity: 0.9 }}>
-            If you pass, you’ll receive a pass notification letter — keep it safe,
+            If you pass, you’ll receive a pass notification email — keep it safe,
             as you’ll need it for your citizenship or ILR application.
           </p>
           <p style={{ marginTop: 0, marginBottom: 0, opacity: 0.9 }}>
@@ -275,44 +284,6 @@ export default function HomePage() {
           <li>Track your progress</li>
           <li>Clean, simple interface</li>
         </ul>
-      </div>
-
-      <div style={{ marginTop: 32 }}>
-        <h2 style={{ margin: '0 0 12px', textAlign: 'center' }}>
-          FEATURED STUDY TOPICS
-        </h2>
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-            gap: 12,
-            textAlign: 'left',
-          }}
-        >
-          {[
-            { label: 'British Values', to: '/topics/british-values' },
-            { label: 'UK History', to: '/topics/uk-history' },
-            { label: 'Government & Law', to: '/topics/government-law' },
-            { label: 'Everyday Life', to: '/topics/everyday-life' },
-          ].map((topic) => (
-            <Link
-              key={topic.to}
-              to={topic.to}
-              style={{
-                display: 'block',
-                padding: 14,
-                borderRadius: 12,
-                border: '1px solid rgba(0,0,0,0.12)',
-                background: '#fff',
-                color: '#111',
-                fontWeight: 600,
-                textDecoration: 'none',
-              }}
-            >
-              {topic.label}
-            </Link>
-          ))}
-        </div>
       </div>
     </div>
   )
